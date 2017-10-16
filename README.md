@@ -1,2 +1,2 @@
 # dynamic-add-date
-MyBatis动态添加日期列和值的插件
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)

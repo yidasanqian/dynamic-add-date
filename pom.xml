@@ -8,12 +8,37 @@
     <artifactId>dynamic-add-date</artifactId>
     <version>1.0.0Beta</version>
 
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <scm>
+        <tag>master</tag>
+        <url>git@github.com:yidasanqian/dynamic-add-date.git</url>
+        <connection>scm:git:git@github.com:yidasanqian/dynamic-add-date.git</connection>
+        <developerConnection>scm:git:git@github.com:yidasanqian/dynamic-add-date.git</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>yidasanqian</name>
+            <email>chenlinyu01@gmail.com</email>
+            <organization>Linyu Chen</organization>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.6</java.version>
     </properties>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
     <dependencies>
         <dependency>
             <groupId>com.github.jsqlparser</groupId>
