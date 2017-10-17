@@ -1,4 +1,4 @@
-package me.yidasanqian;
+package io.github.yidasanqian;
 
 import net.sf.jsqlparser.expression.TimestampValue;
 

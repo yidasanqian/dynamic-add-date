@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.yidasanqian</groupId>
+    <groupId>io.github.yidasanqian</groupId>
     <artifactId>dynamic-add-date</artifactId>
     <version>1.0.0Beta</version>
 
@@ -24,7 +24,6 @@
         <developer>
             <name>yidasanqian</name>
             <email>chenlinyu01@gmail.com</email>
-            <organization>Linyu Chen</organization>
         </developer>
     </developers>
 
