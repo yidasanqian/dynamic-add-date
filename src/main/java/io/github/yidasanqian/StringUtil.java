@@ -1,4 +1,4 @@
-package me.yidasanqian;
+package io.github.yidasanqian;
 
 /**
  * @author Linyu Chen
@@ -12,7 +12,7 @@ public class StringUtil {
      * 将下划线格式转换成驼峰式
      *
      * @param underline 下划线字符串，形如“gmt_create”
-     * @return
+     * @return 返回驼峰式属性，"gmtCreate"
      */
     public static String underlineToHump(String underline) {
         StringBuilder humpProperty = new StringBuilder();
