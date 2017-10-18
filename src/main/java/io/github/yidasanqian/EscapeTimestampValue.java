@@ -19,6 +19,6 @@ public class EscapeTimestampValue extends TimestampValue {
 
     @Override
     public String toString() {
-        return "'" + value + "'";
+        return "'" + value.trim() + "'";
     }
 }
