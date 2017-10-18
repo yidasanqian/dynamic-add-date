@@ -116,7 +116,6 @@ public class AddDateInterceptor implements Interceptor {
             MappedStatement ms = (MappedStatement) metaObject.getValue("mappedStatement");
             SqlCommandType sqlCommandType = ms.getSqlCommandType();
             if (SqlCommandType.INSERT == sqlCommandType || SqlCommandType.UPDATE == sqlCommandType) {
-                logger.warn("原始sql语句已包含自动添加的日期列");
                 BoundSql boundSql = (BoundSql) metaObject.getValue("boundSql");
                 List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
                 Iterator<ParameterMapping> it = parameterMappingList.iterator();
@@ -125,9 +124,11 @@ public class AddDateInterceptor implements Interceptor {
                 while (it.hasNext()) {
                     ParameterMapping pm = it.next();
                     if (pm.getProperty().equals(humpCreateDateProperty)) {
+                        logger.warn("原始Insert Sql语句已包含自动添加的列 : " + createDateColumnName);
                         it.remove();
                     }
                     if (pm.getProperty().equals(humpUpdateDateProperty)) {
+                        logger.warn("原始Update Sql语句已包含自动添加的列 : " + updateDateColumnName);
                         it.remove();
                     }
                 }
