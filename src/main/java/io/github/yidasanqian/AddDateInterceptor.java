@@ -1,6 +1,5 @@
 package io.github.yidasanqian;
 
-import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
@@ -91,35 +90,61 @@ public class AddDateInterceptor implements Interceptor {
                 metaObject.setValue("delegate.boundSql.sql", insert.toString());
             } else if (SqlCommandType.UPDATE == sqlCommandType) {
                 Update update = (Update) CCJSqlParserUtil.parse(sql);
-                // 添加列
-                update.getColumns().add(new Column("gmt_modify"));
-                update.getExpressions().add(new TimestampValue(currentDate));
+                boolean isContainsModifyDateColumn = false;
+                int modifyDateColumnIndex = 0;
+                for (int i = 0; i < update.getColumns().size(); i++) {
+                    Column column = update.getColumns().get(i);
+                    if (column.getColumnName().equals(updateDateColumnName)) {
+                        isContainsModifyDateColumn = true;
+                        modifyDateColumnIndex = i;
+                    }
+                }
+
+                if (isContainsModifyDateColumn) {
+                    updateValueWithIndex(modifyDateColumnIndex, currentDate, update);
+                } else {
+                    updateValue(updateDateColumnName, currentDate, update);
+                }
 
                 logger.debug("intercept 更新sql : " + update.toString());
                 metaObject.setValue("delegate.boundSql.sql", update.toString());
             }
         } else if (METHOD_SETPARAMETERS.equals(invocation.getMethod().getName())) {
-            logger.warn("原始sql语句已包含自动添加的列");
             // 解决原始sql语句已包含自动添加的列导致参数数量映射异常的问题
             ParameterHandler handler = (ParameterHandler) PluginUtil.processTarget(invocation.getTarget());
             MetaObject metaObject = SystemMetaObject.forObject(handler);
-            BoundSql boundSql = (BoundSql) metaObject.getValue("boundSql");
-            List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
-            Iterator<ParameterMapping> it = parameterMappingList.iterator();
-            String humpCreateDateProperty = StringUtil.underlineToHump(createDateColumnName);
-            String humpUpdateDateProperty = StringUtil.underlineToHump(updateDateColumnName);
-            while (it.hasNext()) {
-                ParameterMapping pm = it.next();
-                if (pm.getProperty().equals(humpCreateDateProperty)) {
-                    it.remove();
-                }
-                if (pm.getProperty().equals(humpUpdateDateProperty)) {
-                    it.remove();
+            MappedStatement ms = (MappedStatement) metaObject.getValue("mappedStatement");
+            SqlCommandType sqlCommandType = ms.getSqlCommandType();
+            if (SqlCommandType.INSERT == sqlCommandType || SqlCommandType.UPDATE == sqlCommandType) {
+                logger.warn("原始sql语句已包含自动添加的日期列");
+                BoundSql boundSql = (BoundSql) metaObject.getValue("boundSql");
+                List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+                Iterator<ParameterMapping> it = parameterMappingList.iterator();
+                String humpCreateDateProperty = StringUtil.underlineToHump(createDateColumnName);
+                String humpUpdateDateProperty = StringUtil.underlineToHump(updateDateColumnName);
+                while (it.hasNext()) {
+                    ParameterMapping pm = it.next();
+                    if (pm.getProperty().equals(humpCreateDateProperty)) {
+                        it.remove();
+                    }
+                    if (pm.getProperty().equals(humpUpdateDateProperty)) {
+                        it.remove();
+                    }
                 }
             }
         }
 
         return invocation.proceed();
+    }
+
+    private void updateValueWithIndex(int modifyDateColumnIndex, String currentDate, Update update) {
+        update.getExpressions().set(modifyDateColumnIndex, new EscapeTimestampValue(currentDate));
+    }
+
+    private void updateValue(String updateDateColumnName, String currentDate, Update update) {
+        // 添加列
+        update.getColumns().add(new Column(updateDateColumnName));
+        update.getExpressions().add(new EscapeTimestampValue(currentDate));
     }
 
     private void intoValueWithIndex(final int index, final String columnValue, Insert insert) {
