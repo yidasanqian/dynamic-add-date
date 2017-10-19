@@ -47,8 +47,7 @@ public class AddDateInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         if (METHOD_PREPARE.equals(invocation.getMethod().getName())) {
-            // pattern前面要加空格，避免IllegalArgumentException异常
-            DateFormat dateFormat = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
             final String currentDate = dateFormat.format(new Date());
             StatementHandler handler = (StatementHandler) PluginUtil.processTarget(invocation.getTarget());
             MetaObject metaObject = SystemMetaObject.forObject(handler);
@@ -139,13 +138,13 @@ public class AddDateInterceptor implements Interceptor {
     }
 
     private void updateValueWithIndex(int modifyDateColumnIndex, String currentDate, Update update) {
-        update.getExpressions().set(modifyDateColumnIndex, new EscapeTimestampValue(currentDate));
+        update.getExpressions().set(modifyDateColumnIndex, new QuotationTimestampValue(currentDate));
     }
 
     private void updateValue(String updateDateColumnName, String currentDate, Update update) {
         // 添加列
         update.getColumns().add(new Column(updateDateColumnName));
-        update.getExpressions().add(new EscapeTimestampValue(currentDate));
+        update.getExpressions().add(new QuotationTimestampValue(currentDate));
     }
 
     private void intoValueWithIndex(final int index, final String columnValue, Insert insert) {
@@ -159,14 +158,14 @@ public class AddDateInterceptor implements Interceptor {
             @Override
             public void visit(ExpressionList expressionList) {
                 expressionList.getExpressions()
-                        .set(index, new EscapeTimestampValue(columnValue));
+                        .set(index, new QuotationTimestampValue(columnValue));
             }
 
             @Override
             public void visit(MultiExpressionList multiExpressionList) {
                 for (ExpressionList expressionList : multiExpressionList.getExprList()) {
                     expressionList.getExpressions()
-                            .set(index, new EscapeTimestampValue(columnValue));
+                            .set(index, new QuotationTimestampValue(columnValue));
                 }
             }
         });
@@ -185,14 +184,14 @@ public class AddDateInterceptor implements Interceptor {
             @Override
             public void visit(ExpressionList expressionList) {
                 expressionList.getExpressions()
-                        .add(new EscapeTimestampValue(columnValue));
+                        .add(new QuotationTimestampValue(columnValue));
             }
 
             @Override
             public void visit(MultiExpressionList multiExpressionList) {
                 for (ExpressionList expressionList : multiExpressionList.getExprList()) {
                     expressionList.getExpressions()
-                            .add(new EscapeTimestampValue(columnValue));
+                            .add(new QuotationTimestampValue(columnValue));
                 }
             }
         });

@@ -8,12 +8,12 @@ import net.sf.jsqlparser.expression.TimestampValue;
  *
  * @author Linyu Chen
  */
-public class EscapeTimestampValue extends TimestampValue {
+public class QuotationTimestampValue extends TimestampValue {
 
     private String value;
 
-    public EscapeTimestampValue(String value) {
-        super(value);
+    public QuotationTimestampValue(String value) {
+        super("'" + value + "'");
         this.value = value;
     }
 
