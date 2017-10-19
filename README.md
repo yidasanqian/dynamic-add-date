@@ -1,6 +1,7 @@
 # dynamic-add-date
 [![Build Status](https://travis-ci.org/yidasanqian/dynamic-add-date.svg?branch=master)](https://travis-ci.org/yidasanqian/dynamic-add-date) 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
+[![Maven Central](https://img.shields.io/badge/maven--central-1.0.1Beta-blue.svg)](http://search.maven.org/#artifactdetails%7Cio.github.yidasanqian%7Cdynamic-add-date%7C1.0.1Beta%7Cjar)
 
 Dynamic-add-date是基于Mybatis插件原理开发的可以动态在`Insert`和`Update` Sql语句中添加日期列和对应的值的插件。 
 
@@ -27,6 +28,15 @@ Dynamic-add-date是基于Mybatis插件原理开发的可以动态在`Insert`和`
 若使用Gradle/Grails:
 ```
 compile 'io.github.yidasanqian:dynamic-add-date:1.0.1Beta'
+```
+
+
+然后在`mybatis-config.xml`配置文件中加入如下设置即可：
+```
+<plugins>
+        <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
+        </plugin>
+</plugins>
 ```
 
 例如，原始Sql为：
@@ -59,3 +69,17 @@ compile 'io.github.yidasanqian:dynamic-add-date:1.0.1Beta'
      <property name="updateDateColumnName" value="gmt_modify"/>
  </plugin>
  ```
+ 
+## 与Spring Boot集成
+也是在`mybatis-config.xml`配置文件中加入如下设置：
+```
+ <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
+     <property name="createDateColumnName" value="gmt_create"/>
+     <property name="updateDateColumnName" value="gmt_modify"/>
+ </plugin>
+```
+然后在 `application.properties`加入如下配置即可：
+```
+mybatis.config-location=classpath:mybatis-config.xml
+```
+
