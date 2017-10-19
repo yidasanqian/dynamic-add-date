@@ -123,11 +123,11 @@ public class AddDateInterceptor implements Interceptor {
                 while (it.hasNext()) {
                     ParameterMapping pm = it.next();
                     if (pm.getProperty().equals(humpCreateDateProperty)) {
-                        logger.warn("原始Insert Sql语句已包含自动添加的列 : " + createDateColumnName);
+                        logger.warn("原始Sql语句已包含自动添加的列 : " + createDateColumnName);
                         it.remove();
                     }
                     if (pm.getProperty().equals(humpUpdateDateProperty)) {
-                        logger.warn("原始Update Sql语句已包含自动添加的列 : " + updateDateColumnName);
+                        logger.warn("原始Sql语句已包含自动添加的列 : " + updateDateColumnName);
                         it.remove();
                     }
                 }
