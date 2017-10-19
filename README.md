@@ -66,7 +66,7 @@ compile 'io.github.yidasanqian:dynamic-add-date:1.0.1Beta'
  ```
  <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
      <property name="createDateColumnName" value="gmt_create"/>
-     <property name="updateDateColumnName" value="gmt_modify"/>
+     <property name="updateDateColumnName" value="gmt_modified"/>
  </plugin>
  ```
  
@@ -75,7 +75,7 @@ compile 'io.github.yidasanqian:dynamic-add-date:1.0.1Beta'
 ```
  <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
      <property name="createDateColumnName" value="gmt_create"/>
-     <property name="updateDateColumnName" value="gmt_modify"/>
+     <property name="updateDateColumnName" value="gmt_modified"/>
  </plugin>
 ```
 然后在 `application.properties`加入如下配置即可：
