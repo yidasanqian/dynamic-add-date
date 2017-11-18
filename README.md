@@ -1,6 +1,6 @@
 # dynamic-add-date
 [![Build Status](https://travis-ci.org/yidasanqian/dynamic-add-date.svg?branch=master)](https://travis-ci.org/yidasanqian/dynamic-add-date) 
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://opensource.org/licenses/MIT)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/yidasanqian/dynamic-add-date/blob/master/LICENSE)
 [![Maven Central](https://img.shields.io/badge/maven--central-1.0.3-blue.svg)](http://search.maven.org/#artifactdetails%7Cio.github.yidasanqian%7Cdynamic-add-date%7C1.0.3%7Cjar)
 
 Dynamic-add-date是基于Mybatis插件原理开发的可以动态在`Insert`和`Update` Sql语句中添加日期列和对应的值的插件。 
@@ -71,6 +71,15 @@ compile 'io.github.yidasanqian:dynamic-add-date:1.0.3'
  ```
  
 ## 与Spring Boot集成
+首先mybatis依赖
+```
+<!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter -->
+<dependency>
+    <groupId>org.mybatis.spring.boot</groupId>
+    <artifactId>mybatis-spring-boot-starter</artifactId>
+    <version>1.3.1</version>
+</dependency>
+```
 也是在`mybatis-config.xml`配置文件中加入如下设置：
 ```
  <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
