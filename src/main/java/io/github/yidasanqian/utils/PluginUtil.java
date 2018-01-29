@@ -1,4 +1,4 @@
-package io.github.yidasanqian;
+package io.github.yidasanqian.utils;
 
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
