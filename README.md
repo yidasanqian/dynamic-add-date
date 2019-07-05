@@ -82,6 +82,9 @@ compile 'io.github.yidasanqian:dynamic-add-date:1.0.4'
     <version>1.3.1</version>
 </dependency>
 ```
+其次写入自定义配置：
+
+1）xml方式进行配置  
 也是在`mybatis-config.xml`配置文件中加入如下设置：
 ```
  <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
@@ -94,9 +97,22 @@ compile 'io.github.yidasanqian:dynamic-add-date:1.0.4'
 mybatis.config-location=classpath:mybatis-config.xml
 ```
 
+2）创建bean方式进行配置 
+```
+@Bean
+public AddDateInterceptor addDateInterceptor(){
+    Properties properties = new Properties();
+    properties.setProperty("createDateColumnName","gmt_create");
+    properties.setProperty("updateDateColumnName","gmt_modified");
+    AddDateInterceptor addDateInterceptor = new AddDateInterceptor();
+    addDateInterceptor.setProperties(properties);
+    return addDateInterceptor;
+}
+```
 ## 忽略表
 实际应用中并不是所有的表都需要创建时间和更新时间字段，如何设置忽略处理的表呢？
 
+1）xml方式  
 也是在`mybatis-config.xml`配置文件中加入如下设置：
 ```
 <plugins>
@@ -105,6 +121,20 @@ mybatis.config-location=classpath:mybatis-config.xml
     </plugin>
 </plugins>
 ```    
+
+2）创建Bean方式 
+```
+@Bean
+public AddDateInterceptor addDateInterceptor(){
+    Properties properties = new Properties();
+    properties.setProperty("createDateColumnName","gmt_create");
+    properties.setProperty("updateDateColumnName","gmt_modified");
+    properties.setProperty("ignoreTables","^user.*, permission");
+    AddDateInterceptor addDateInterceptor = new AddDateInterceptor();
+    addDateInterceptor.setProperties(properties);
+    return addDateInterceptor;
+}
+```
 其中name=`ignoreTables`属性值为固定，不能变，value的格式：`表名, 表名`。
 
 其中value的值为表名，支持正则表达式，且多个表名以英文逗号`,`分隔。
