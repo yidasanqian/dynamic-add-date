@@ -1,4 +1,4 @@
-package io.github.yidasanqian;
+package io.github.yidasanqian.dynamicadddate;
 
 import net.sf.jsqlparser.expression.TimestampValue;
 
@@ -6,7 +6,7 @@ import net.sf.jsqlparser.expression.TimestampValue;
  * 解决与alibaba druid整合时出现的异常：
  * <p>com.alibaba.druid.sql.parser.ParserException: ERROR. token : LBRACE
  *
- * @author Linyu Chen
+ * @author yidasanqian
  */
 public class QuotationTimestampValue extends TimestampValue {
 

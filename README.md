@@ -1,6 +1,6 @@
 # dynamic-add-date
 [![Build Status](https://travis-ci.org/yidasanqian/dynamic-add-date.svg?branch=master)](https://travis-ci.org/yidasanqian/dynamic-add-date) 
-[![Maven Central](https://img.shields.io/badge/maven--central-1.0.4-blue.svg)](http://search.maven.org/#artifactdetails%7Cio.github.yidasanqian%7Cdynamic-add-date%7C1.0.4%7Cjar)
+[![Maven Central](https://img.shields.io/badge/maven--central-1.0.4-blue.svg)](http://search.maven.org/#artifactdetails%7Cio.github.yidasanqian.dynamicadddate%7Cdynamic-add-date%7C1.0.4%7Cjar)
 [![LICENSE](https://img.shields.io/badge/license-NPL%20(The%20996%20Prohibited%20License)-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
@@ -21,7 +21,7 @@ Dynamic-add-date是基于Mybatis插件原理开发的可以动态在`Insert`和`
 添加下面的依赖到你的pom文件中：
 ```
 <dependency>
-    <groupId>io.github.yidasanqian</groupId>
+    <groupId>io.github.yidasanqian.dynamicadddate</groupId>
     <artifactId>dynamic-add-date</artifactId>
     <version>1.0.4</version>
 </dependency>
@@ -29,14 +29,14 @@ Dynamic-add-date是基于Mybatis插件原理开发的可以动态在`Insert`和`
 
 若使用Gradle/Grails:
 ```
-compile 'io.github.yidasanqian:dynamic-add-date:1.0.4'
+compile 'io.github.yidasanqian.dynamicadddate:dynamic-add-date:1.0.4'
 ```
 
 
 然后在`mybatis-config.xml`配置文件中加入如下设置即可：
 ```
 <plugins>
-        <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
+        <plugin interceptor="io.github.yidasanqian.dynamicadddate.AddDateInterceptor">
         </plugin>
 </plugins>
 ```
@@ -66,7 +66,7 @@ compile 'io.github.yidasanqian:dynamic-add-date:1.0.4'
  
  可以通过设置key `createDateColumnName`和 `updateDateColumnName`来分别指定日期列的名称：
  ```
- <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
+ <plugin interceptor="io.github.yidasanqian.dynamicadddate.AddDateInterceptor">
      <property name="createDateColumnName" value="gmt_create"/>
      <property name="updateDateColumnName" value="gmt_modified"/>
  </plugin>
@@ -87,7 +87,7 @@ compile 'io.github.yidasanqian:dynamic-add-date:1.0.4'
 1）xml方式进行配置  
 也是在`mybatis-config.xml`配置文件中加入如下设置：
 ```
- <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
+ <plugin interceptor="io.github.yidasanqian.dynamicadddate.AddDateInterceptor">
      <property name="createDateColumnName" value="gmt_create"/>
      <property name="updateDateColumnName" value="gmt_modified"/>
  </plugin>
@@ -116,7 +116,7 @@ public AddDateInterceptor addDateInterceptor(){
 也是在`mybatis-config.xml`配置文件中加入如下设置：
 ```
 <plugins>
-    <plugin interceptor="io.github.yidasanqian.AddDateInterceptor">
+    <plugin interceptor="io.github.yidasanqian.dynamicadddate.AddDateInterceptor">
         <property name="ignoreTables" value="^user.*, permission"/>
     </plugin>
 </plugins>

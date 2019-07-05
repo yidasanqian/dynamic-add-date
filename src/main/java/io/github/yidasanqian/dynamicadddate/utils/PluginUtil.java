@@ -1,4 +1,4 @@
-package io.github.yidasanqian.utils;
+package io.github.yidasanqian.dynamicadddate.utils;
 
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
@@ -6,7 +6,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import java.lang.reflect.Proxy;
 
 /**
- * @author Linyu Chen
+ * @author yidasanqian
  */
 public class PluginUtil {
     private PluginUtil() {

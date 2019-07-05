@@ -1,7 +1,7 @@
-package io.github.yidasanqian;
+package io.github.yidasanqian.dynamicadddate;
 
-import io.github.yidasanqian.utils.PluginUtil;
-import io.github.yidasanqian.utils.StringUtil;
+import io.github.yidasanqian.dynamicadddate.utils.PluginUtil;
+import io.github.yidasanqian.dynamicadddate.utils.StringUtil;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * @author Linyu Chen
+ * @author yidasanqian
  */
 @Intercepts({@Signature(type = StatementHandler.class,
         method = "prepare", args = {Connection.class, Integer.class}),
@@ -39,8 +39,8 @@ import java.util.*;
 })
 public class AddDateInterceptor implements Interceptor {
 
+    private static final Logger log = LoggerFactory.getLogger(AddDateInterceptor.class);
     private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String METHOD_PREPARE = "prepare";
     private static final String METHOD_SETPARAMETERS = "setParameters";
@@ -64,7 +64,7 @@ public class AddDateInterceptor implements Interceptor {
             SqlCommandType sqlCommandType = ms.getSqlCommandType();
             String sql = metaObject.getValue("delegate.boundSql.sql").toString();
             Statement statement = CCJSqlParserUtil.parse(sql);
-            logger.debug("intercept 原始sql : " + sql);
+            log.debug("intercept 原始sql : " + sql);
             if (SqlCommandType.INSERT == sqlCommandType) {
                 Insert insert = (Insert) statement;
                 if (!matchesIgnoreTables(insert.getTable().getName())) {
@@ -96,7 +96,7 @@ public class AddDateInterceptor implements Interceptor {
                         intoValue(updateDateColumnName, currentDate, insert);
                     }
 
-                    logger.debug("intercept 插入sql : " + insert.toString());
+                    log.debug("intercept 插入sql : " + insert.toString());
                     metaObject.setValue("delegate.boundSql.sql", insert.toString());
                 }
 
@@ -121,7 +121,7 @@ public class AddDateInterceptor implements Interceptor {
                             updateValue(updateDateColumnName, currentDate, update);
                         }
 
-                        logger.debug("intercept 更新sql : " + update.toString());
+                        log.debug("intercept 更新sql : " + update.toString());
                         metaObject.setValue("delegate.boundSql.sql", update.toString());
                     }
                 }
@@ -166,11 +166,11 @@ public class AddDateInterceptor implements Interceptor {
         while (it.hasNext()) {
             ParameterMapping pm = it.next();
             if (pm.getProperty().equals(camelCaseCreateDateProperty)) {
-                logger.warn("原始Sql语句已包含自动添加的列 : " + createDateColumnName);
+                log.warn("原始Sql语句已包含自动添加的列 : " + createDateColumnName);
                 it.remove();
             }
             if (pm.getProperty().equals(camelCaseUpdateDateProperty)) {
-                logger.warn("原始Sql语句已包含自动添加的列 : " + updateDateColumnName);
+                log.warn("原始Sql语句已包含自动添加的列 : " + updateDateColumnName);
                 it.remove();
             }
         }
