@@ -4,7 +4,7 @@
 
     <groupId>io.github.yidasanqian</groupId>
     <artifactId>dynamic-add-date</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>dynamic-add-date</name>
@@ -30,7 +30,7 @@
         <connection>scm:git:git://github.com/yidasanqian/dynamic-add-date.git</connection>
         <developerConnection>scm:git:git@github.com:yidasanqian/dynamic-add-date.git</developerConnection>
         <url>https://github.com/yidasanqian/dynamic-add-date/tree/master</url>
-      <tag>v1.1.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
