@@ -5,13 +5,15 @@ import io.github.yidasanqian.dynamicadddate.utils.StringUtil;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.update.Update;
+import net.sf.jsqlparser.statement.values.ValuesStatement;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -153,6 +155,24 @@ public class AddDateInterceptor implements Interceptor {
         return invocation.proceed();
     }
 
+    @Override
+    public Object plugin(Object target) {
+        return Plugin.wrap(target, this);
+    }
+
+    @Override
+    public void setProperties(Properties properties) {
+        createDateColumnName = properties.getProperty("createDateColumnName", "gmt_create");
+        updateDateColumnName = properties.getProperty("updateDateColumnName", "gmt_modified");
+        String ignoreTable = properties.getProperty("ignoreTables", "");
+        if (ignoreTable.length() > 0) {
+            String[] tables = ignoreTable.split(",");
+            ignoreTableList = Arrays.asList(tables);
+        } else {
+            ignoreTableList = Collections.emptyList();
+        }
+    }
+
     /**
      * 解决原始sql语句已包含自动添加的列导致参数数量映射异常的问题
      *
@@ -203,69 +223,115 @@ public class AddDateInterceptor implements Interceptor {
 
     private void intoValueWithIndex(final int index, final String columnValue, Insert insert) {
         // 通过visitor设置对应的值
-        insert.getItemsList().accept(new ItemsListVisitor() {
-            @Override
-            public void visit(SubSelect subSelect) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
+        if (insert.getItemsList() == null) {
+            insert.getSelect().getSelectBody().accept(new PlainSelectVisitor(index, columnValue));
+        } else {
+            insert.getItemsList().accept(new ItemsListVisitor() {
+                @Override
+                public void visit(SubSelect subSelect) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
 
-            @Override
-            public void visit(ExpressionList expressionList) {
-                expressionList.getExpressions()
-                        .set(index, new QuotationTimestampValue(columnValue));
-            }
-
-            @Override
-            public void visit(MultiExpressionList multiExpressionList) {
-                for (ExpressionList expressionList : multiExpressionList.getExprList()) {
+                @Override
+                public void visit(ExpressionList expressionList) {
                     expressionList.getExpressions()
                             .set(index, new QuotationTimestampValue(columnValue));
                 }
-            }
-        });
+
+                @Override
+                public void visit(NamedExpressionList namedExpressionList) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                @Override
+                public void visit(MultiExpressionList multiExpressionList) {
+                    for (ExpressionList expressionList : multiExpressionList.getExprList()) {
+                        expressionList.getExpressions()
+                                .set(index, new QuotationTimestampValue(columnValue));
+                    }
+                }
+            });
+        }
     }
 
     private void intoValue(String columnName, final String columnValue, Insert insert) {
         // 添加列
         insert.getColumns().add(new Column(columnName));
         // 通过visitor设置对应的值
-        insert.getItemsList().accept(new ItemsListVisitor() {
-            @Override
-            public void visit(SubSelect subSelect) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
+        if (insert.getItemsList() == null) {
+            insert.getSelect().getSelectBody().accept(new PlainSelectVisitor(-1, columnValue));
+        } else {
+            insert.getItemsList().accept(new ItemsListVisitor() {
+                @Override
+                public void visit(SubSelect subSelect) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
 
-            @Override
-            public void visit(ExpressionList expressionList) {
-                expressionList.getExpressions()
-                        .add(new QuotationTimestampValue(columnValue));
-            }
-
-            @Override
-            public void visit(MultiExpressionList multiExpressionList) {
-                for (ExpressionList expressionList : multiExpressionList.getExprList()) {
+                @Override
+                public void visit(ExpressionList expressionList) {
                     expressionList.getExpressions()
                             .add(new QuotationTimestampValue(columnValue));
                 }
+
+                @Override
+                public void visit(NamedExpressionList namedExpressionList) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                @Override
+                public void visit(MultiExpressionList multiExpressionList) {
+                    for (ExpressionList expressionList : multiExpressionList.getExprList()) {
+                        expressionList.getExpressions()
+                                .add(new QuotationTimestampValue(columnValue));
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 支持INSERT INTO SELECT 语句
+     */
+    private class PlainSelectVisitor implements SelectVisitor {
+        int index;
+        String columnValue;
+
+        public PlainSelectVisitor(int index, String columnValue) {
+            this.index = index;
+            this.columnValue = columnValue;
+        }
+
+        @Override
+        public void visit(PlainSelect plainSelect) {
+            if (index != -1) {
+                plainSelect.getSelectItems().set(index, new SelectExpressionItem(new QuotationTimestampValue(columnValue)));
+            } else {
+                plainSelect.getSelectItems().add(new SelectExpressionItem(new QuotationTimestampValue(columnValue)));
             }
-        });
-    }
+        }
 
-    @Override
-    public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
-    }
+        @Override
+        public void visit(SetOperationList setOperationList) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
 
-    @Override
-    public void setProperties(Properties properties) {
-        createDateColumnName = properties.getProperty("createDateColumnName", "gmt_create");
-        updateDateColumnName = properties.getProperty("updateDateColumnName", "gmt_modified");
-        String ignoreTable = properties.getProperty("ignoreTables", "");
-        if (ignoreTable.trim().length() > 0) {
-            String[] tables = ignoreTable.split(",");
-            ignoreTableList = Arrays.asList(tables);
-        } else {
-            ignoreTableList = Collections.emptyList();
+        @Override
+        public void visit(WithItem withItem) {
+            if (index != -1) {
+                withItem.getWithItemList().set(index, new SelectExpressionItem(new QuotationTimestampValue(columnValue)));
+            } else {
+                withItem.getWithItemList().add(new SelectExpressionItem(new QuotationTimestampValue(columnValue)));
+            }
+        }
+
+        @Override
+        public void visit(ValuesStatement valuesStatement) {
+            if (index != -1) {
+                valuesStatement.getExpressions().set(index, new QuotationTimestampValue(columnValue));
+            } else {
+                valuesStatement.getExpressions().add(index, new QuotationTimestampValue(columnValue));
+            }
+
         }
     }
 }
