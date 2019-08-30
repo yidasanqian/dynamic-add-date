@@ -11,7 +11,12 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectVisitor;
+import net.sf.jsqlparser.statement.select.SetOperationList;
+import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
@@ -20,7 +25,11 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.slf4j.Logger;
@@ -30,10 +39,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
 
 /**
- * @author yidasanqian
+ * @author yidasanqian@gmail.com
  */
 @Intercepts({@Signature(type = StatementHandler.class,
         method = "prepare", args = {Connection.class, Integer.class}),
@@ -98,34 +113,32 @@ public class AddDateInterceptor implements Interceptor {
                         intoValue(updateDateColumnName, currentDate, insert);
                     }
 
-                    log.debug("intercept 插入sql : " + insert.toString());
+                    log.debug("intercept 插入sql: {}", insert.toString());
                     metaObject.setValue("delegate.boundSql.sql", insert.toString());
                 }
 
             } else if (SqlCommandType.UPDATE == sqlCommandType) {
                 Update update = (Update) statement;
-                List<Table> tableList = update.getTables();
-                for (Table table : tableList) {
-                    if (!matchesIgnoreTables(table.getName())) {
-                        boolean isContainsModifyDateColumn = false;
-                        int modifyDateColumnIndex = 0;
-                        for (int i = 0; i < update.getColumns().size(); i++) {
-                            Column column = update.getColumns().get(i);
-                            if (column.getColumnName().equals(updateDateColumnName)) {
-                                isContainsModifyDateColumn = true;
-                                modifyDateColumnIndex = i;
-                            }
+                Table table = update.getTable();
+                if (!matchesIgnoreTables(table.getName())) {
+                    boolean isContainsModifyDateColumn = false;
+                    int modifyDateColumnIndex = 0;
+                    for (int i = 0; i < update.getColumns().size(); i++) {
+                        Column column = update.getColumns().get(i);
+                        if (column.getColumnName().equals(updateDateColumnName)) {
+                            isContainsModifyDateColumn = true;
+                            modifyDateColumnIndex = i;
                         }
-
-                        if (isContainsModifyDateColumn) {
-                            updateValueWithIndex(modifyDateColumnIndex, currentDate, update);
-                        } else {
-                            updateValue(updateDateColumnName, currentDate, update);
-                        }
-
-                        log.debug("intercept 更新sql : " + update.toString());
-                        metaObject.setValue("delegate.boundSql.sql", update.toString());
                     }
+
+                    if (isContainsModifyDateColumn) {
+                        updateValueWithIndex(modifyDateColumnIndex, currentDate, update);
+                    } else {
+                        updateValue(updateDateColumnName, currentDate, update);
+                    }
+
+                    log.debug("intercept 更新sql: {}", update.toString());
+                    metaObject.setValue("delegate.boundSql.sql", update.toString());
                 }
             }
         } else if (METHOD_SETPARAMETERS.equals(invocation.getMethod().getName())) {
@@ -143,11 +156,9 @@ public class AddDateInterceptor implements Interceptor {
 
             } else if (SqlCommandType.UPDATE == sqlCommandType) {
                 Update update = (Update) statement;
-                List<Table> tableList = update.getTables();
-                for (Table table : tableList) {
-                    if (!matchesIgnoreTables(table.getName())) {
-                        handleParameterMapping(boundSql);
-                    }
+                Table table = update.getTable();
+                if (!matchesIgnoreTables(table.getName())) {
+                    handleParameterMapping(boundSql);
                 }
             }
         }
@@ -186,11 +197,11 @@ public class AddDateInterceptor implements Interceptor {
         while (it.hasNext()) {
             ParameterMapping pm = it.next();
             if (pm.getProperty().equals(camelCaseCreateDateProperty)) {
-                log.warn("原始Sql语句已包含自动添加的列 : " + createDateColumnName);
+                log.debug("原始Sql语句已包含自动添加的列: {}", createDateColumnName);
                 it.remove();
             }
             if (pm.getProperty().equals(camelCaseUpdateDateProperty)) {
-                log.warn("原始Sql语句已包含自动添加的列 : " + updateDateColumnName);
+                log.debug("原始Sql语句已包含自动添加的列: {}", updateDateColumnName);
                 it.remove();
             }
         }

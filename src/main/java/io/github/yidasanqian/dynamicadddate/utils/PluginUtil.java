@@ -6,7 +6,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import java.lang.reflect.Proxy;
 
 /**
- * @author yidasanqian
+ * @author yidasanqian@gmail.com
  */
 public class PluginUtil {
     private PluginUtil() {

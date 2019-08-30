@@ -1,7 +1,7 @@
 package io.github.yidasanqian.dynamicadddate.utils;
 
 /**
- * @author yidasanqian
+ * @author yidasanqian@gmail.com
  */
 public class StringUtil {
 
