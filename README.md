@@ -1,8 +1,6 @@
 # dynamic-add-date
 [![Build Status](https://travis-ci.org/yidasanqian/dynamic-add-date.svg?branch=master)](https://travis-ci.org/yidasanqian/dynamic-add-date) 
 [![Maven Central](https://img.shields.io/badge/maven--central-1.1.0-blue.svg)](http://search.maven.org/#artifactdetails%7Cio.github.yidasanqian.dynamicadddate%7Cdynamic-add-date%7C1.1.0%7Cjar)
-[![LICENSE](https://img.shields.io/badge/license-NPL%20(The%20996%20Prohibited%20License)-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
-[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
 Dynamic-add-date是基于Mybatis插件原理开发的可以动态在`Insert`和`Update` Sql语句中添加日期列和对应的值的插件。 
 
